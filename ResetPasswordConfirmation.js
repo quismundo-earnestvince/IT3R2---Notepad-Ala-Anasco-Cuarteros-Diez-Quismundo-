@@ -4,6 +4,19 @@ import InputField from "../components/InputField";
 import ThemeButton from "../components/ThemeButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import zxcvbn from 'zxcvbn'; 
+import { Ionicons } from '@expo/vector-icons'; 
+
+const CustomCheckbox = ({ checked, onPress }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.checkbox}>
+      {checked ? (
+        <Ionicons name="checkbox-outline" size={18} color="blue" />
+      ) : (
+        <Ionicons name="square-outline" size={18} color="blue" />
+      )}
+    </TouchableOpacity>
+  );
+};
  
 const ResetPasswordConfirmation = ({ route, navigation }) => {
   const { email } = route.params;
@@ -102,7 +115,7 @@ const ResetPasswordConfirmation = ({ route, navigation }) => {
         secureTextEntry={!showPassword}
       />
       <View style={styles.showPasswordContainer}>
-        <CheckBox value={showPassword} onValueChange={toggleShowPassword} />
+        <CustomCheckbox checked={showPassword} onPress={toggleShowPassword} />
         <Text style={styles.showPasswordText}>{showPasswordText}</Text>
       </View>
  
