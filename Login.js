@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Text, TouchableOpacity, Image, CheckBox  } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, TouchableOpacity, Image } from 'react-native';
+import * as Font from 'expo-font';
+
 import InputField from "../components/InputField";
 import ThemeButton from "../components/ThemeButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { Ionicons } from '@expo/vector-icons'; 
+
+const CustomCheckbox = ({ checked, onPress }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.checkbox}>
+      {checked ? (
+        <Ionicons name="checkbox-outline" size={24} color="blue" />
+      ) : (
+        <Ionicons name="square-outline" size={24} color="blue" />
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -27,6 +43,22 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     setEmailErrorMessage('');
     setPasswordErrorMessage('');
+
+  useEffect(() => {
+      const loadFonts = async () => {
+        try {
+          await Font.loadAsync({
+            'JimNightshade-Regular': require('../assets/fonts/JimNightshade-Regular.ttf'),
+            // Add more fonts if necessary  
+          });
+        } catch (error) {
+          console.error('Font loading error:', error);
+        }
+      };
+  
+      loadFonts();
+    }, []);
+    
 
     if (password.trim() === ''){
       setPasswordErrorMessage('Please enter password');
@@ -100,10 +132,10 @@ const LoginScreen = ({ navigation }) => {
         {passwordErrorMessage !== '' && <Text style={styles.errorText}>{passwordErrorMessage}</Text>}
         <InputField label="Password" value={password} onChangeText={text => setPassword(text)} secureTextEntry={!showPassword} />
         <View style={styles.showPasswordContainer}>
-          <CheckBox value={showPassword} onValueChange={toggleShowPassword} />
-          <Text style={styles.showPasswordText}>Show Password</Text>
+          <CustomCheckbox checked={showPassword} onPress={toggleShowPassword} />
+          <Text style={styles.showPasswordText}>{showPasswordText}</Text>
           <TouchableOpacity onPress={handleForgotPassword}>
-          <Text style={styles.forgotPasswordText}>Forgot Password</Text>
+            <Text style={styles.forgotPasswordText}>Forgot Password</Text>
           </TouchableOpacity>
         </View>
         <ThemeButton title="Login" onPress={handleLogin} />
@@ -126,12 +158,12 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 35,
-    fontWeight: '550',
+    fontWeight: 'bold', 
     padding: 10,
     textAlign: 'center',
     position: 'absolute',
     top: 40,
-    fontFamily: 'JimNightshade-Regular',
+    fontFamily: 'JimNightshade-Regular', 
     color: 'black',
   },
   curveContainer: {
@@ -142,29 +174,29 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
     backgroundColor: 'white',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    flexWrap: 'wrap',
+    flexWrap: '',
   },
   loginText: {
     fontSize: 20,
     bottom: 40,
-    fontWeight: '500',
-    fontFamily: 'Ineria Serif',
+    fontWeight: 'bold', 
+    fontFamily: 'JimNightshade-Regular', 
   },
   forgotPasswordText: {
     fontSize: 11,
     color: 'blue',
     right: -50,
-    fontFamily: 'Ineria Serif',
+    fontFamily: 'JimNightshade-Regular', 
     marginTop: 2
   },
   signUpText: {
     fontSize: 12,
     bottom: -20,
     color: 'blue',
-    fontFamily: 'Ineria Serif',
+    fontFamily: 'JimNightshade-Regular', 
   },
   errorText: {
     fontSize: 10,
