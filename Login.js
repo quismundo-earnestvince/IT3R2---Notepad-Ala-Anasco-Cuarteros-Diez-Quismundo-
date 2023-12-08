@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Text, TouchableOpacity, Image } from 'react-native';
 import * as Font from 'expo-font';
-
+// import CheckBox from '@react-native-community/checkbox';
 import InputField from "../components/InputField";
 import ThemeButton from "../components/ThemeButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,9 +12,9 @@ const CustomCheckbox = ({ checked, onPress }) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.checkbox}>
       {checked ? (
-        <Ionicons name="checkbox-outline" size={24} color="blue" />
+        <Ionicons name="checkbox-outline" size={18} color="blue" />
       ) : (
-        <Ionicons name="square-outline" size={24} color="blue" />
+        <Ionicons name="square-outline" size={18} color="blue" />
       )}
     </TouchableOpacity>
   );
@@ -49,7 +49,7 @@ const LoginScreen = ({ navigation }) => {
         try {
           await Font.loadAsync({
             'JimNightshade-Regular': require('../assets/fonts/JimNightshade-Regular.ttf'),
-            // Add more fonts if necessary  
+    
           });
         } catch (error) {
           console.error('Font loading error:', error);
@@ -132,6 +132,7 @@ const LoginScreen = ({ navigation }) => {
         {passwordErrorMessage !== '' && <Text style={styles.errorText}>{passwordErrorMessage}</Text>}
         <InputField label="Password" value={password} onChangeText={text => setPassword(text)} secureTextEntry={!showPassword} />
         <View style={styles.showPasswordContainer}>
+          {/* Replace the Checkbox component with CustomCheckbox */}
           <CustomCheckbox checked={showPassword} onPress={toggleShowPassword} />
           <Text style={styles.showPasswordText}>{showPasswordText}</Text>
           <TouchableOpacity onPress={handleForgotPassword}>
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 35,
-    fontWeight: 'bold', 
+    fontWeight: 'bold', // or fontWeight: '500' (TEMPORARY NEED TO FEIX PA NI)
     padding: 10,
     textAlign: 'center',
     position: 'absolute',
@@ -182,21 +183,21 @@ const styles = StyleSheet.create({
   loginText: {
     fontSize: 20,
     bottom: 40,
-    fontWeight: 'bold', 
-    fontFamily: 'JimNightshade-Regular', 
+    fontWeight: 'bold', // or fontWeight: '500' (TEMPORARY NEED TO FEIX PA NI)
+    fontFamily: 'JimNightshade-Regular', //Ineria Serif (TEMPORARY NEED TO FEIX PA NI)
   },
   forgotPasswordText: {
     fontSize: 11,
     color: 'blue',
-    right: -50,
-    fontFamily: 'JimNightshade-Regular', 
-    marginTop: 2
+    right: -30,
+    fontFamily: 'JimNightshade-Regular', //Ineria Serif (TEMPORARY NEED TO FEIX PA NI)
+    marginTop: 1.5
   },
   signUpText: {
     fontSize: 12,
     bottom: -20,
     color: 'blue',
-    fontFamily: 'JimNightshade-Regular', 
+    fontFamily: 'JimNightshade-Regular', //Ineria Serif (TEMPORARY NEED TO FEIX PA NI)
   },
   errorText: {
     fontSize: 10,
@@ -226,10 +227,16 @@ const styles = StyleSheet.create({
  },
 
  showPasswordText: {
-    marginLeft: 5,
+    marginLeft: 16,
+    marginTop:1,
     fontSize: 11,
     color: 'black',
  },
+
+ checkbox: {
+  padding: 0,
+  left: 12 
+},
   
 });
 export default LoginScreen;
