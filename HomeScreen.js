@@ -27,13 +27,17 @@ const HomeScreen = ({ navigation }) => {
     refreshNotes();
   });
 
-  const renderNote = ({ item }) => (
-    <TouchableOpacity style={styles.noteCard}>
-      <Text style={styles.noteTitle}>{item.title}</Text>
-      <Text style={styles.noteContent}>{item.note}</Text>
-      <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
-    </TouchableOpacity>
-  );
+  const renderNote = ({ item }) => {
+    const truncatedNote = item.note.length > 50 ? `${item.note.substring(0, 25)}...` : item.note;
+
+    return (
+      <TouchableOpacity style={styles.noteCard}>
+        <Text style={styles.noteTitle}>{item.title}</Text>
+        <Text style={styles.noteContent}>{truncatedNote}</Text>
+        <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
