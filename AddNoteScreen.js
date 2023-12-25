@@ -1,40 +1,35 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, AsyncStorage } from 'react-native';
+import moment from 'moment';
 
 const AddNote = ({ navigation }) => {
-  const dataCategory = [ 
-    { id: 1, name: 'Category 1' },
-    { id: 2, name: 'Category 2' },
-
-  ];
-
-  const [category_id, setCategoryId] = useState(dataCategory.length > 0 ? dataCategory[0].id : '');
-  const [category, setCategory] = useState(dataCategory.length > 0 ? dataCategory[0].name : '');
   const [note, setNote] = useState('');
   const [title, setTitle] = useState('');
 
-  const setDefaultCategory = () => {
-    if (dataCategory.length > 0) {
-      setCategoryId(dataCategory[0].id);
-      setCategory(dataCategory[0].name);
-    }
-  };
+  const insertNote = async () => {
+    if (title !== '') {
+      const dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
-  const updateCategory = input => {
-    setCategory(input);
-    dataCategory.forEach(category => {
-      if (category.name === input) {
-        setCategoryId(category.id);
+      const newNote = {
+        id: dateTime,
+        title,
+        note,
+        dateTime,
+      };
+
+      try {
+        const existingNotes = await AsyncStorage.getItem('notes');
+        let notes = [];
+
+        if (existingNotes !== null) {
+          notes = JSON.parse(existingNotes);
+        }
+
+        notes.push(newNote);
+        await AsyncStorage.setItem('notes', JSON.stringify(notes));
+      } catch (error) {
+        console.error('Error saving note:', error);
       }
-    });
-  };
-
-  const insertNote = () => {
-    if (title !== '' && category !== '') {
-    
-      console.log({ title, note, category, category_id });
 
       navigation.navigate('HomeScreen');
     }
@@ -53,20 +48,6 @@ const AddNote = ({ navigation }) => {
         multiline={true}
         value={note}
       />
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={category}
-          onValueChange={updateCategory}
-        >
-          {dataCategory.map((categoryItem, key) => (
-            <Picker.Item
-              key={key}
-              label={categoryItem.name}
-              value={categoryItem.name}
-            />
-          ))}
-        </Picker>
-      </View>
       <TouchableOpacity onPress={insertNote} style={styles.button}>
         <Text>Add Note</Text>
       </TouchableOpacity>
@@ -84,13 +65,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10
   },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 5,
-    marginTop: 10,
-    marginBottom: 10
-  }
 });
 
 export default AddNote;
