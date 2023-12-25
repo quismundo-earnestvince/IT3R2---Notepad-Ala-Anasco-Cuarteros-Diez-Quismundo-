@@ -1,35 +1,45 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
-import AddNoteScreen from './AddNoteScreen';
-
+import { Ionicons } from '@expo/vector-icons';
+import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
+  const [notesData, setNotesData] = useState([]);
 
-  const notesData = [
-    { id: 1, title: 'Note 1', content: 'This is the content of Note 1' },
-    { id: 2, title: 'Note 2', content: 'This is the content of Note 2' },
-    // Add more notes as needed...
-  ];
+  const fetchNotes = async () => {
+    try {
+      const storedNotes = await AsyncStorage.getItem('notes');
+      if (storedNotes !== null) {
+        setNotesData(JSON.parse(storedNotes));
+      }
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+    }
+  };
 
+  const refreshNotes = async () => {
+    await fetchNotes();
+  };
+
+  useFocusEffect(() => {
+    refreshNotes();
+  });
 
   const renderNote = ({ item }) => (
     <TouchableOpacity style={styles.noteCard}>
       <Text style={styles.noteTitle}>{item.title}</Text>
-      <Text style={styles.noteContent}>{item.content}</Text>
+      <Text style={styles.noteContent}>{item.note}</Text>
+      <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-     
       <View style={styles.topSection}>
-       
         <Ionicons name="person-circle-outline" size={30} color="black" />
-     
         <Text style={styles.titleText}>Notepad</Text>
-       
         <Ionicons name="filter" size={30} color="black" />
       </View>
 
@@ -39,7 +49,6 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-    
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddNoteScreen')}
@@ -78,6 +87,11 @@ const styles = StyleSheet.create({
   },
   noteContent: {
     fontSize: 16,
+    marginTop: 5,
+  },
+  noteDateTime: {
+    fontSize: 12,
+    color: '#666',
     marginTop: 5,
   },
   addButton: {
