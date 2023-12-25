@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, AsyncStorage } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const AddNote = ({ navigation }) => {
   const [note, setNote] = useState('');
@@ -27,16 +29,19 @@ const AddNote = ({ navigation }) => {
 
         notes.push(newNote);
         await AsyncStorage.setItem('notes', JSON.stringify(notes));
-      } catch (error) {
-        console.error('Error saving note:', error);
-      }
 
-      navigation.navigate('HomeScreen');
+        
     }
   };
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.titleText}>Notepad</Text>
+      </View>
       <TextInput
         placeholder="ADD TITLE..."
         onChangeText={text => setTitle(text)}
@@ -58,6 +63,20 @@ const AddNote = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 10,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   button: {
     alignItems: 'center',
