@@ -1,3 +1,4 @@
+// New HomeScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,7 +33,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleDeleteNote = (id) => {
-
     console.log('Delete note with ID:', id);
   };
 
@@ -40,16 +40,19 @@ const HomeScreen = ({ navigation }) => {
     const truncatedNote = item.note.length > 50 ? `${item.note.substring(0, 25)}...` : item.note;
 
     return (
-      <TouchableOpacity style={styles.noteCard}>
+      <TouchableOpacity
+        style={styles.noteCard}
+        onPress={() => navigation.navigate('ViewNoteScreen', { noteContent: item.note })}
+      >
         <View style={styles.noteHeader}>
           <Text style={styles.noteTitle}>{item.title}</Text>
           <View style={styles.iconsContainer}>
-            <TouchableOpacity onPress={() => handleEditNote(item.id)}>
-              <Ionicons name="pencil-outline" size={18} color="black" style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
+          <TouchableOpacity onPress={() => handleEditNote(item.id)}>
+            <Ionicons name="create-outline" size={18} color="black" style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
               <Ionicons name="trash-outline" size={18} color="black" style={styles.icon} />
-            </TouchableOpacity>
+          </TouchableOpacity>
           </View>
         </View>
         <Text style={styles.noteContent}>{truncatedNote}</Text>
