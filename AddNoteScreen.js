@@ -30,7 +30,15 @@ const AddNote = ({ navigation }) => {
         notes.push(newNote);
         await AsyncStorage.setItem('notes', JSON.stringify(notes));
 
-        
+        Alert.alert('Note Saved!', '', [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('HomeScreen'), 
+          },
+        ]);
+      } catch (error) {
+        console.error('Error saving note:', error);
+      }
     }
   };
 
