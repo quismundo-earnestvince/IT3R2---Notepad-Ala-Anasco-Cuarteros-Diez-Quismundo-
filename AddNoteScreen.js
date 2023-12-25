@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNote = ({ navigation }) => {
   const [note, setNote] = useState('');
@@ -33,7 +33,9 @@ const AddNote = ({ navigation }) => {
         Alert.alert('Note Saved!', '', [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('HomeScreen'), 
+            onPress: () => {
+              navigation.navigate('HomeScreen');
+            },
           },
         ]);
       } catch (error) {
@@ -50,17 +52,19 @@ const AddNote = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.titleText}>Notepad</Text>
       </View>
+
       <TextInput
         placeholder="ADD TITLE..."
-        onChangeText={text => setTitle(text)}
+        onChangeText={(text) => setTitle(text)}
         value={title}
       />
       <TextInput
         placeholder="ADD DESCRIPTION..."
-        onChangeText={text => setNote(text)}
+        onChangeText={(text) => setNote(text)}
         multiline={true}
         value={note}
       />
+
       <TouchableOpacity onPress={insertNote} style={styles.button}>
         <Text>Add Note</Text>
       </TouchableOpacity>
