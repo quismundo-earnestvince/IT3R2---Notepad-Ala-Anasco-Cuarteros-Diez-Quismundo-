@@ -27,12 +27,31 @@ const HomeScreen = ({ navigation }) => {
     refreshNotes();
   });
 
+  const handleEditNote = (id) => {
+    console.log('Edit note with ID:', id);
+  };
+
+  const handleDeleteNote = (id) => {
+
+    console.log('Delete note with ID:', id);
+  };
+
   const renderNote = ({ item }) => {
     const truncatedNote = item.note.length > 50 ? `${item.note.substring(0, 25)}...` : item.note;
 
     return (
       <TouchableOpacity style={styles.noteCard}>
-        <Text style={styles.noteTitle}>{item.title}</Text>
+        <View style={styles.noteHeader}>
+          <Text style={styles.noteTitle}>{item.title}</Text>
+          <View style={styles.iconsContainer}>
+            <TouchableOpacity onPress={() => handleEditNote(item.id)}>
+              <Ionicons name="pencil-outline" size={18} color="black" style={styles.icon} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
+              <Ionicons name="trash-outline" size={18} color="black" style={styles.icon} />
+            </TouchableOpacity>
+          </View>
+        </View>
         <Text style={styles.noteContent}>{truncatedNote}</Text>
         <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
       </TouchableOpacity>
@@ -85,6 +104,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 8,
   },
+  noteHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
   noteTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -97,6 +122,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginTop: 5,
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+  },
+  icon: {
+    marginLeft: 10,
   },
   addButton: {
     position: 'absolute',
