@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert, KeyboardAvoidingView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -57,12 +57,14 @@ const AddNote = ({ navigation }) => {
         placeholder="ADD TITLE..."
         onChangeText={(text) => setTitle(text)}
         value={title}
+        style={styles.input}
       />
       <TextInput
         placeholder="ADD DESCRIPTION..."
         onChangeText={(text) => setNote(text)}
         multiline={true}
         value={note}
+        style={[styles.input, styles.descriptionInput]}
       />
 
       <TouchableOpacity onPress={insertNote} style={styles.button}>
@@ -74,13 +76,16 @@ const AddNote = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10
+    flex: 1,
+    padding: 10,
+    justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 30,
   },
   backButton: {
     position: 'absolute',
@@ -90,11 +95,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  input: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 0,
+  },
+  descriptionInput: {
+    height: 500, 
+  },
   button: {
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
-    padding: 10,
-    marginTop: 10
+    padding: 15,
+    marginBottom: 20, 
   },
 });
 
