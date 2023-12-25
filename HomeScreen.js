@@ -1,13 +1,16 @@
-// New HomeScreen.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
+import DeleteNoteAlert from '../components/DeleteNoteAlert'; 
+
 const HomeScreen = ({ navigation }) => {
   const [notesData, setNotesData] = useState([]);
+  const [deleteNoteId, setDeleteNoteId] = useState(null);
+  const alertRef = useRef(null);
 
   const fetchNotes = async () => {
     try {
@@ -33,7 +36,28 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleDeleteNote = (id) => {
-    console.log('Delete note with ID:', id);
+    setDeleteNoteId(id);
+    alertRef.current.open();
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteNoteId !== null) {
+      try {
+        const existingNotes = await AsyncStorage.getItem('notes');
+        let notes = [];
+
+        if (existingNotes !== null) {
+          notes = JSON.parse(existingNotes);
+          const updatedNotes = notes.filter((note) => note.id !== deleteNoteId);
+          await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+          refreshNotes();
+        }
+      } catch (error) {
+        console.error('Error deleting note:', error);
+      } finally {
+        alertRef.current?.close();
+      }
+    }
   };
 
   const renderNote = ({ item }) => {
@@ -47,17 +71,19 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.noteHeader}>
           <Text style={styles.noteTitle}>{item.title}</Text>
           <View style={styles.iconsContainer}>
-          <TouchableOpacity onPress={() => handleEditNote(item.id)}>
-            <Ionicons name="create-outline" size={18} color="black" style={styles.icon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
+            <TouchableOpacity onPress={() => handleEditNote(item.id)}>
+              <Ionicons name="create-outline" size={18} color="black" style={styles.icon} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
               <Ionicons name="trash-outline" size={18} color="black" style={styles.icon} />
-          </TouchableOpacity>
+            </TouchableOpacity>
           </View>
         </View>
         <Text style={styles.noteContent}>{truncatedNote}</Text>
         <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
       </TouchableOpacity>
+
+      
     );
   };
 
@@ -75,9 +101,14 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
+      <DeleteNoteAlert // Render the DeleteNoteAlert component
+        alertRef={alertRef}
+        deleteNoteId={deleteNoteId}
+        handleConfirmDelete={handleConfirmDelete}
+      />
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AddNoteScreen')}
+         onPress={() => navigation.navigate('AddNoteScreen')}
       >
         <Ionicons name="add-circle-outline" size={50} color="black" />
       </TouchableOpacity>
@@ -89,7 +120,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop:30,
     backgroundColor: 'white',
+    
   },
   topSection: {
     flexDirection: 'row',
