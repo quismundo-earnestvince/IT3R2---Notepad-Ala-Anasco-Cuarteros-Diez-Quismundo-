@@ -54,10 +54,10 @@ const AddNote = ({ navigation }) => {
       </View>
 
       <TextInput
-        placeholder="ADD TITLE..."
+        placeholder="Title"
         onChangeText={(text) => setTitle(text)}
         value={title}
-        style={styles.input}
+        style={[styles.input, styles.titleInput]}
       />
       <TextInput
         placeholder="ADD DESCRIPTION..."
@@ -96,20 +96,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
+    borderWidth: 0,
+    borderRadius: 0,
     padding: 10,
     marginBottom: 0,
   },
+  titleInput: {
+    borderBottomWidth: 2,
+    borderColor: 'black',
+    fontSize: 20,
+  },
   descriptionInput: {
-    height: 500, 
+    height: 500,
+    textAlignVertical:"top",
+    fontSize: 17,
   },
   button: {
     alignItems: 'center',
     backgroundColor: '#DDDDDD',
     padding: 15,
-    marginBottom: 20, 
+    marginBottom: 20,
   },
 });
 
