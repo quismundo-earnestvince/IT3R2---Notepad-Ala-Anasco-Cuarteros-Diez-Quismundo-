@@ -5,7 +5,7 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
-import DeleteNoteAlert from '../components/DeleteNoteAlert'; 
+import DeleteNoteAlert from '../components/DeleteNoteAlert'; // Import the new component
 
 const HomeScreen = ({ navigation }) => {
   const [notesData, setNotesData] = useState([]);
@@ -31,8 +31,12 @@ const HomeScreen = ({ navigation }) => {
     refreshNotes();
   });
 
-  const handleEditNote = (id) => {
-    console.log('Edit note with ID:', id);
+  const handleEditNote = (id, title, note) => {
+    navigation.navigate('EditNoteScreen', {
+      noteId: id,
+      existingTitle: title,
+      existingNote: note,
+    });
   };
 
   const handleDeleteNote = (id) => {
@@ -71,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.noteHeader}>
           <Text style={styles.noteTitle}>{item.title}</Text>
           <View style={styles.iconsContainer}>
-            <TouchableOpacity onPress={() => handleEditNote(item.id)}>
+            <TouchableOpacity onPress={() => handleEditNote(item.id, item.title, item.note)}>
               <Ionicons name="create-outline" size={18} color="black" style={styles.icon} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
@@ -101,7 +105,7 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-      <DeleteNoteAlert 
+      <DeleteNoteAlert // Render the DeleteNoteAlert component
         alertRef={alertRef}
         deleteNoteId={deleteNoteId}
         handleConfirmDelete={handleConfirmDelete}
