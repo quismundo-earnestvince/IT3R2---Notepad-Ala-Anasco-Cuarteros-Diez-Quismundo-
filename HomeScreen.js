@@ -5,7 +5,7 @@ import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
-import DeleteNoteAlert from '../components/DeleteNoteAlert'; // Import the new component
+import DeleteNoteAlert from '../components/DeleteNoteAlert';
 
 const HomeScreen = ({ navigation }) => {
   const [notesData, setNotesData] = useState([]);
@@ -105,7 +105,7 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-      <DeleteNoteAlert // Render the DeleteNoteAlert component
+      <DeleteNoteAlert 
         alertRef={alertRef}
         deleteNoteId={deleteNoteId}
         handleConfirmDelete={handleConfirmDelete}
