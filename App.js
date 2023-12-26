@@ -12,11 +12,12 @@ import HomeScreen from './containers/HomeScreen';
 import IntroScreen from './containers/IntroScreen';
 import AddNoteScreen from './containers/AddNoteScreen';
 import ViewNoteScreen from './containers/ViewNoteScreen';
+import EditNoteScreen from './containers/EditNoteScreen';
 
 const fetchFonts = () => {
   return Font.loadAsync({
     'JimNightshade-Regular': require('./assets/fonts/JimNightshade-Regular.ttf'),
-    // Add other custom fonts here if needed
+ 
   });
 };
 
@@ -65,6 +66,7 @@ const App = () => {
         <Stack.Screen name="HomeScreen" component={HomeScreen} />
         <Stack.Screen name="AddNoteScreen" component={AddNoteScreen} />
         <Stack.Screen name="ViewNoteScreen" component={ViewNoteScreen} />
+        <Stack.Screen name="EditNoteScreen" component={EditNoteScreen} />
 
         
       </Stack.Navigator>
