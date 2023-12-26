@@ -66,7 +66,7 @@ const HomeScreen = ({ navigation }) => {
     return (
       <TouchableOpacity
         style={styles.noteCard}
-        onPress={() => navigation.navigate('ViewNoteScreen', { noteContent: item.note })}
+        onPress={() => navigation.navigate('ViewNoteScreen', { noteContent: item })}
       >
         <View style={styles.noteHeader}>
           <Text style={styles.noteTitle}>{item.title}</Text>
@@ -101,7 +101,7 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-      <DeleteNoteAlert // Render the DeleteNoteAlert component
+      <DeleteNoteAlert 
         alertRef={alertRef}
         deleteNoteId={deleteNoteId}
         handleConfirmDelete={handleConfirmDelete}
