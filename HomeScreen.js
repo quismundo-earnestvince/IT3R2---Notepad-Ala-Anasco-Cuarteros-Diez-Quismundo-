@@ -10,6 +10,8 @@ import DeleteNoteAlert from '../components/DeleteNoteAlert';
 const HomeScreen = ({ navigation }) => {
   const [notesData, setNotesData] = useState([]);
   const [deleteNoteId, setDeleteNoteId] = useState(null);
+  const [sortBy, setSortBy] = useState(null); 
+  const [showSortOptions, setShowSortOptions] = useState(false);
   const alertRef = useRef(null);
 
   const fetchNotes = async () => {
@@ -22,6 +24,26 @@ const HomeScreen = ({ navigation }) => {
       console.error('Error fetching notes:', error);
     }
   };
+
+  
+
+
+  const renderSortOptions = () => {
+    if (showSortOptions) {
+      return (
+        <View style={styles.sortOptions}>
+          <TouchableOpacity onPress={() => handleSort('oldestToLatest')}>
+            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Oldest to Latest</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('alphabetically')}>
+            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Alphabetically</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return null;
+  };
+  
 
   const refreshNotes = async () => {
     await fetchNotes();
@@ -86,8 +108,6 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.noteContent}>{truncatedNote}</Text>
         <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
       </TouchableOpacity>
-
-      
     );
   };
 
@@ -96,8 +116,12 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.topSection}>
         <Ionicons name="person-circle-outline" size={30} color="black" />
         <Text style={styles.titleText}>Notepad</Text>
-        <Ionicons name="filter" size={30} color="black" />
+        <TouchableOpacity onPress={handleFilterClick}>
+          <Ionicons name="filter" size={30} color="black" />
+        </TouchableOpacity>
       </View>
+
+      {renderSortOptions()} 
 
       <FlatList
         data={notesData}
@@ -112,7 +136,7 @@ const HomeScreen = ({ navigation }) => {
       />
       <TouchableOpacity
         style={styles.addButton}
-         onPress={() => navigation.navigate('AddNoteScreen')}
+        onPress={() => navigation.navigate('AddNoteScreen')}
       >
         <Ionicons name="add-circle-outline" size={50} color="black" />
       </TouchableOpacity>
@@ -124,9 +148,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop:30,
+    paddingTop: 30,
     backgroundColor: 'white',
-    
   },
   topSection: {
     flexDirection: 'row',
@@ -174,6 +197,38 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
   },
-});
+  sortOptions: {
+    backgroundColor: '#fff',
+    padding: 10,
+    position: 'absolute',
+    top: 70,
+    right: 20,
+    elevation: 5,
+    borderRadius: 5,
+  },
+  sortOptions: {
+    backgroundColor: '#fff',
+    padding: 10,
+    position: 'absolute',
+    top: 70,
+    right: 20,
+    elevation: 5,
+    borderRadius: 5,
+    zIndex: 1,
+  },
+  sortOptionMargin: {
+    margin: 5,
+    marginBottom: 5, 
+  },
+
+    sortOptionText: {
+      fontSize: 17, 
+      paddingVertical: 5,
+    },
+  });
+  
+  
+  
+
 
 export default HomeScreen;
