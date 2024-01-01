@@ -111,9 +111,14 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.topSection}>
         <Ionicons name="person-circle-outline" size={30} color="black" />
         <Text style={styles.titleText}>Notepad</Text>
-        <TouchableOpacity onPress={() => setShowSortOptions(!showSortOptions)}>
-          <Ionicons name="filter" size={30} color="black" />
-        </TouchableOpacity>
+        <View style={styles.topIcon}>
+          <TouchableOpacity onPress={() => setShowSortOptions(!showSortOptions)}>
+            <Ionicons name="search-outline" size={30} color="black" style={styles.iconsTop} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowSortOptions(!showSortOptions)}>
+            <Ionicons name="filter" size={30} color="black" style={styles.iconsTop} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {showSortOptions && (
@@ -190,12 +195,18 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
+  topIcon: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+  },
   iconsContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
   },
   icon: {
-    marginLeft: 10,
+    marginRight: 10,
   },
+  
   addButton: {
     position: 'absolute',
     bottom: 20,
@@ -205,16 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     position: 'absolute',
-    top: 70,
-    right: 20,
-    elevation: 5,
-    borderRadius: 5,
-  },
-  sortOptions: {
-    backgroundColor: '#fff',
-    padding: 10,
-    position: 'absolute',
-    top: 70,
+    top: 100,
     right: 20,
     elevation: 5,
     borderRadius: 5,
@@ -229,7 +231,14 @@ const styles = StyleSheet.create({
       fontSize: 17, 
       paddingVertical: 5,
     },
+
+    iconsTop: {
+      marginRight: 10,
+    },
   });
   
+  
+  
+
 
 export default HomeScreen;
