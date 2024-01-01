@@ -10,43 +10,25 @@ import DeleteNoteAlert from '../components/DeleteNoteAlert';
 const HomeScreen = ({ navigation }) => {
   const [notesData, setNotesData] = useState([]);
   const [deleteNoteId, setDeleteNoteId] = useState(null);
-  const [sortBy, setSortBy] = useState(null); 
+  const [sortBy, setSortBy] = useState(null);
   const [showSortOptions, setShowSortOptions] = useState(false);
   const alertRef = useRef(null);
 
-  const fetchNotes = async () => {
+  const fetchAndSortNotes = async () => {
     try {
       const storedNotes = await AsyncStorage.getItem('notes');
       if (storedNotes !== null) {
-        setNotesData(JSON.parse(storedNotes));
+        let parsedNotes = JSON.parse(storedNotes);
+        if (sortBy === 'latestToOldest') {
+          parsedNotes.sort((a, b) => moment(b.dateTime).valueOf() - moment(a.dateTime).valueOf());
+        } else if (sortBy === 'alphabetically') {
+          parsedNotes.sort((a, b) => a.title.localeCompare(b.title));
+        }
+        setNotesData(parsedNotes);
       }
     } catch (error) {
-      console.error('Error fetching notes:', error);
+      console.error('Error fetching or sorting notes:', error);
     }
-  };
-
-  
-
-
-  const renderSortOptions = () => {
-    if (showSortOptions) {
-      return (
-        <View style={styles.sortOptions}>
-          <TouchableOpacity onPress={() => handleSort('oldestToLatest')}>
-            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Oldest to Latest</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleSort('alphabetically')}>
-            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Alphabetically</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-    return null;
-  };
-  
-
-  const refreshNotes = async () => {
-    await fetchNotes();
   };
 
   useFocusEffect(() => {
@@ -116,12 +98,21 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.topSection}>
         <Ionicons name="person-circle-outline" size={30} color="black" />
         <Text style={styles.titleText}>Notepad</Text>
-        <TouchableOpacity onPress={handleFilterClick}>
+        <TouchableOpacity onPress={() => setShowSortOptions(!showSortOptions)}>
           <Ionicons name="filter" size={30} color="black" />
         </TouchableOpacity>
       </View>
 
-      {renderSortOptions()} 
+      {showSortOptions && (
+        <View style={styles.sortOptions}>
+          <TouchableOpacity onPress={() => handleSort('latestToOldest')}>
+            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Latest To Oldest</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('alphabetically')}>
+            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Alphabetically</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <FlatList
         data={notesData}
@@ -226,9 +217,5 @@ const styles = StyleSheet.create({
       paddingVertical: 5,
     },
   });
-  
-  
-  
-
 
 export default HomeScreen;
