@@ -31,6 +31,15 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const handleSort = (method) => {
+    setSortBy(method);
+    fetchAndSortNotes();
+  };
+
+  const refreshNotes = async () => {
+    await fetchAndSortNotes();
+  };
+
   useFocusEffect(() => {
     refreshNotes();
   });
@@ -67,6 +76,10 @@ const HomeScreen = ({ navigation }) => {
       }
     }
   };
+
+  useEffect(() => {
+    refreshNotes();
+  }, [sortBy]);
 
   const renderNote = ({ item }) => {
     const truncatedNote = item.note.length > 50 ? `${item.note.substring(0, 25)}...` : item.note;
@@ -217,5 +230,6 @@ const styles = StyleSheet.create({
       paddingVertical: 5,
     },
   });
+  
 
 export default HomeScreen;
