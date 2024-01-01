@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef, } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +12,7 @@ const HomeScreen = ({ navigation }) => {
   const [deleteNoteId, setDeleteNoteId] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const [searchText, setSearchText] = useState('');
   const alertRef = useRef(null);
 
   const fetchAndSortNotes = async () => {
@@ -104,7 +105,17 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
       </TouchableOpacity>
     );
+    
   };
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+  };
+
+  const filteredNotes = notesData.filter((note) => {
+    return note.title.toLowerCase().includes(searchText.toLowerCase());
+  });
+
 
   return (
     <View style={styles.container}>
@@ -132,8 +143,15 @@ const HomeScreen = ({ navigation }) => {
         </View>
       )}
 
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search notes..."
+        onChangeText={handleSearch}
+        value={searchText}
+      />
+
       <FlatList
-        data={notesData}
+        data={filteredNotes}
         renderItem={renderNote}
         keyExtractor={(item) => item.id.toString()}
       />
@@ -153,11 +171,12 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 30,
+    paddingTop: 32,
     backgroundColor: 'white',
   },
   topSection: {
@@ -234,6 +253,14 @@ const styles = StyleSheet.create({
 
     iconsTop: {
       marginRight: 10,
+    },
+    searchBar: {
+      backgroundColor: '#fff',
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      marginHorizontal: 20,
+      borderRadius: 8,
+      marginBottom: 10,
     },
   });
   
