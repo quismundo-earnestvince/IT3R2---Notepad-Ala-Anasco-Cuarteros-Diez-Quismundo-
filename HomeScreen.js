@@ -13,6 +13,7 @@ const HomeScreen = ({ navigation }) => {
   const [sortBy, setSortBy] = useState(null);
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [showSearchBar, setShowSearchBar] = useState(false);
   const alertRef = useRef(null);
 
   const fetchAndSortNotes = async () => {
@@ -112,9 +113,23 @@ const HomeScreen = ({ navigation }) => {
     setSearchText(text);
   };
 
+
+
   const filteredNotes = notesData.filter((note) => {
     return note.title.toLowerCase().includes(searchText.toLowerCase());
   });
+
+  const handleFilterIconPress = () => {
+    setShowSortOptions(!showSortOptions); 
+    setShowSearchBar(false); 
+    setSearchText(''); 
+  };
+
+  const handleSearchIconPress = () => {
+    setShowSearchBar(!showSearchBar);
+    setShowSortOptions(false);
+    setSearchText(''); 
+  };
 
 
   return (
@@ -123,10 +138,10 @@ const HomeScreen = ({ navigation }) => {
         <Ionicons name="person-circle-outline" size={30} color="black" />
         <Text style={styles.titleText}>Notepad</Text>
         <View style={styles.topIcon}>
-          <TouchableOpacity onPress={() => setShowSortOptions(!showSortOptions)}>
+          <TouchableOpacity onPress={handleSearchIconPress}>
             <Ionicons name="search-outline" size={30} color="black" style={styles.iconsTop} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowSortOptions(!showSortOptions)}>
+          <TouchableOpacity onPress={handleFilterIconPress}>
             <Ionicons name="filter" size={30} color="black" style={styles.iconsTop} />
           </TouchableOpacity>
         </View>
@@ -143,12 +158,14 @@ const HomeScreen = ({ navigation }) => {
         </View>
       )}
 
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search notes..."
-        onChangeText={handleSearch}
-        value={searchText}
-      />
+      {showSearchBar && ( 
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search notes..."
+          onChangeText={handleSearch}
+          value={searchText}
+        />
+      )}
 
       <FlatList
         data={filteredNotes}
@@ -264,8 +281,5 @@ const styles = StyleSheet.create({
     },
   });
   
-  
-  
-
 
 export default HomeScreen;
