@@ -7,8 +7,24 @@ import MessageBox from '../components/MessageBox';
 import zxcvbn from 'zxcvbn';
 import { generate } from 'random-words';
 import ProfilePage from './ProfilePage'; 
+import HomeScreen from './HomeScreen'; 
+import { Ionicons } from '@expo/vector-icons';
+
+const CustomCheckbox = ({ checked, onPress }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.checkbox}>
+      {checked ? (
+        <Ionicons name="checkbox-outline" size={24} color="blue" />
+      ) : (
+        <Ionicons name="square-outline" size={24} color="blue" />
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const SignUp = ({ navigation }) => {
+  // const [isMessageBoxOpen, setIsMessageBoxOpen] = useState(false); 
+  // const [message, setMessage] = useState('');
   const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,18 +44,27 @@ const SignUp = ({ navigation }) => {
   const [passwordStrength, setPasswordStrength] = useState('');
   const [passwordColor, setPasswordColor] = useState('');
   const [confirmPasswordErrorTop, setConfirmPasswordErrorTop] = useState('');
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [showMessageBox, setShowMessageBox] = useState(false);
-  const [message, setMessage] = useState('');
 
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(''); 
+
+  // const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  // const [successMessage, setSuccessMessage] = useState('');
+  // const [isSuccessMessageOpen, setIsSuccessMessageOpen] = useState(false);
+
+  
+
+  useEffect(() => {
+    console.log('showSuccessMessage changed:', showSuccessMessage);
+  }, [showSuccessMessage]);
+
+  
   const generateRecoveryWords = () => {
     return generate({ exactly: 3, wordsPerString: 1 });
   };
 
-  const closeMessageBox = () => {
-    setShowMessageBox(false);
-    navigation.navigate('Dashboard');
-  };
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -93,19 +118,19 @@ const SignUp = ({ navigation }) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     };
-
+  
     const emailAlreadyExists = (newEmail) => {
       return userData.some((user) => user.email === newEmail);
     };
-
+  
     setFirstNameError('');
     setLastNameError('');
     setEmailError('');
     setPasswordError('');
     setConfirmPasswordError('');
-
+  
     let hasError = false;
-
+  
     if (!firstname) {
       setFirstNameError('Please Enter First Name');
       hasError = true;
@@ -114,7 +139,7 @@ const SignUp = ({ navigation }) => {
       setLastNameError('Please Enter Last Name');
       hasError = true;
     }
-
+  
     if (!confirmpassword) {
       setConfirmPasswordError('Please Enter Confirm Password');
       hasError = true;
@@ -122,27 +147,27 @@ const SignUp = ({ navigation }) => {
       setConfirmPasswordError('Password did not match.');
       hasError = true;
     }
-
+  
     if (!email) {
       setEmailError('Please Enter Email');
       hasError = true;
-    }  else if (!validateEmail(email)) {
+    } else if (!validateEmail(email)) {
       setEmailError('Please Enter a Valid Email');
       hasError = true;
     } else if (emailAlreadyExists(email)) {
       setEmailError('Email is already in use.');
       hasError = true;
     }
-
+  
     if (!password) {
       setPasswordError('Please Enter Password');
       hasError = true;
     }
-
+  
     if (hasError) {
       return;
     }
-
+  
     try {
       const newUser = {
         id: userData.length + 1,
@@ -152,35 +177,41 @@ const SignUp = ({ navigation }) => {
         password: password,
         recoveryWords: generateRecoveryWords(),
       };
+  
+      
+      const updatedUserData = [...userData, newUser];
+  
+      setUserData(updatedUserData);
+  
 
-      userData.push(newUser);
-
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
-      await AsyncStorage.setItem(email, JSON.stringify(newUser.recoveryWords));
-
+      await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
+  
       setFirstName('');
       setLastName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
-
-      navigation.navigate("ProfilePage", {
-        user: {
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-          email: newUser.email,
-        },
+  
+  
+      navigation.navigate('HomeScreen', {
+        successMessage: `Sign up successful! Your recovery words are: ${newUser.recoveryWords.join(', ')}`,
       });
-
-      const successMessage = `Sign up successful! Your recovery words are: ${newUser.recoveryWords.join(', ')}`;
-      setMessage(successMessage);
-      setShowMessageBox(true);
-
     } catch (error) {
       console.error('Error saving user data:', error);
       alert('Error signing up. Please try again.');
     }
   };
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      
+      const timeout = setTimeout(() => {
+        setShowSuccessMessage(false); 
+      }, 10000); 
+
+      return () => clearTimeout(timeout); 
+    }
+  }, [showSuccessMessage]);
 
   const updatePasswordError = () => {
     if (password === '') {
@@ -193,9 +224,20 @@ const SignUp = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+
+      <MessageBox
+          message={successMessage}
+          visible={showSuccessMessage} 
+          onClose={() => setShowSuccessMessage(false)}
+        />
+        
+        
         <Text style={styles.headerText}>Sign Up</Text>
+        
+        
 
         <View style={styles.curveContainer}>
+
           {firstnameError ? <Text style={styles.errorText}>{firstnameError}</Text> : null}
           <InputField label="First Name" value={firstname} onChangeText={text => setFirstName(text)} secureTextEntry={false} />
 
@@ -205,16 +247,8 @@ const SignUp = ({ navigation }) => {
           {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
           <InputField label="Email" value={email} onChangeText={text => setEmail(text)} secureTextEntry={false}/>
 
-          {showMessageBox && (
-            <MessageBox
-              message={message}
-              onClose={closeMessageBox}
-            />
-          )}
-
-          {showSuccessMessage && (
-            <Text style={styles.successText}>Sign up successful!</Text>
-          )}
+          
+          
 
           {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
           {passwordStrength && (
@@ -255,7 +289,7 @@ const SignUp = ({ navigation }) => {
           />
 
           <View style={styles.showPasswordContainer}>
-            <CheckBox value={showPassword} onValueChange={toggleShowPassword} />
+            <CustomCheckbox checked={showPassword} onPress={toggleShowPassword} />
             <Text style={styles.showPasswordText}>Show Password</Text>
           </View>
 
@@ -308,7 +342,7 @@ const styles = StyleSheet.create({
   curveContainer: {
     position: 'absolute',
     bottom: 0,
-    height: screenHeight / 1.3,
+    height: screenHeight / 1.2,
     borderTopLeftRadius: 80,
     borderTopRightRadius: 0,
     backgroundColor: 'white',
@@ -351,3 +385,5 @@ const styles = StyleSheet.create({
 });
 
 export default SignUp;
+
+
