@@ -4,6 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
+
+
 
 import DeleteNoteAlert from '../components/DeleteNoteAlert';
 
@@ -15,6 +18,39 @@ const HomeScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [showSearchBar, setShowSearchBar] = useState(false);
   const alertRef = useRef(null);
+
+
+  useFocusEffect(
+  React.useCallback(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      const successMessage = routeParams?.successMessage || '';
+      if (successMessage) {
+        alert(successMessage);
+      }
+      refreshNotes();
+    });
+
+    return unsubscribe;
+  }, [navigation, routeParams])
+);
+  
+  
+  const { params: routeParams } = useRoute();
+
+useFocusEffect(
+  React.useCallback(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      const successMessage = routeParams?.successMessage || '';
+      if (successMessage) {
+        alert(successMessage);
+      }
+      refreshNotes();
+    });
+
+    return unsubscribe;
+  }, [navigation, routeParams])
+);
+
 
   const fetchAndSortNotes = async () => {
     try {
@@ -126,8 +162,8 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleSearchIconPress = () => {
-    setShowSearchBar(!showSearchBar);
-    setShowSortOptions(false);
+    setShowSearchBar(!showSearchBar); 
+    setShowSortOptions(false); 
     setSearchText(''); 
   };
 
@@ -281,5 +317,11 @@ const styles = StyleSheet.create({
     },
   });
   
+  
+  
+
 
 export default HomeScreen;
+
+
+
