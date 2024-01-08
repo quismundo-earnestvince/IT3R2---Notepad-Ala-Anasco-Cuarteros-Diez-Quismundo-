@@ -10,7 +10,7 @@ import DeleteNoteAlert from '../components/DeleteNoteAlert';
 
 const SuccessMessage = ({ message, onClose }) => {
   return (
-    <Modal transparent visible={!!message} >
+    <Modal transparent visible={!!message} animationType="slide" >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalText}>{message}</Text>
