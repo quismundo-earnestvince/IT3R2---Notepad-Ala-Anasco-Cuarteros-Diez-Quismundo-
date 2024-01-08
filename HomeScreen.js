@@ -1,14 +1,27 @@
 import React, { useEffect, useState, useRef, } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 
-
-
 import DeleteNoteAlert from '../components/DeleteNoteAlert';
+
+const SuccessMessage = ({ message, onClose }) => {
+  return (
+    <Modal transparent visible={!!message} >
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>{message}</Text>
+          <TouchableOpacity onPress={onClose}>
+            <Text style={styles.closeText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const HomeScreen = ({ navigation }) => {
   const [notesData, setNotesData] = useState([]);
@@ -17,39 +30,44 @@ const HomeScreen = ({ navigation }) => {
   const [showSortOptions, setShowSortOptions] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const alertRef = useRef(null);
+
+  const handleSuccessClose = () => {
+    setSuccessMessage('');
+  };
 
 
   useFocusEffect(
-  React.useCallback(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      const successMessage = routeParams?.successMessage || '';
-      if (successMessage) {
-        alert(successMessage);
-      }
-      refreshNotes();
-    });
-
-    return unsubscribe;
-  }, [navigation, routeParams])
-);
+    React.useCallback(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+        const message = routeParams?.successMessage || '';
+        if (message) {
+          setSuccessMessage(message);
+        }
+        refreshNotes();
+      });
   
+      return unsubscribe;
+    }, [navigation, routeParams])
+  );
+
   
   const { params: routeParams } = useRoute();
 
-useFocusEffect(
-  React.useCallback(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      const successMessage = routeParams?.successMessage || '';
-      if (successMessage) {
-        alert(successMessage);
-      }
-      refreshNotes();
-    });
+// useFocusEffect(
+//   React.useCallback(() => {
+//     const unsubscribe = navigation.addListener('focus', () => {
+//       const successMessage = routeParams?.successMessage || '';
+//       if (successMessage) {
+//         alert(successMessage);
+//       }
+//       refreshNotes();
+//     });
 
-    return unsubscribe;
-  }, [navigation, routeParams])
-);
+//     return unsubscribe;
+//   }, [navigation, routeParams])
+// );
 
 
   const fetchAndSortNotes = async () => {
@@ -122,6 +140,7 @@ useFocusEffect(
   const renderNote = ({ item }) => {
     const truncatedNote = item.note.length > 50 ? `${item.note.substring(0, 25)}...` : item.note;
 
+    
     return (
       <TouchableOpacity
         style={styles.noteCard}
@@ -156,13 +175,13 @@ useFocusEffect(
   });
 
   const handleFilterIconPress = () => {
-    setShowSortOptions(!showSortOptions); 
+    setShowSortOptions(!showSortOptions);
     setShowSearchBar(false); 
     setSearchText(''); 
   };
 
   const handleSearchIconPress = () => {
-    setShowSearchBar(!showSearchBar); 
+    setShowSearchBar(!showSearchBar);
     setShowSortOptions(false); 
     setSearchText(''); 
   };
@@ -182,6 +201,9 @@ useFocusEffect(
           </TouchableOpacity>
         </View>
       </View>
+
+      <SuccessMessage message={successMessage} onClose={handleSuccessClose} />
+
 
       {showSortOptions && (
         <View style={styles.sortOptions}>
@@ -314,6 +336,29 @@ const styles = StyleSheet.create({
       marginHorizontal: 20,
       borderRadius: 8,
       marginBottom: 10,
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    },
+    modalView: {
+      backgroundColor: 'white',
+      borderRadius: 10,
+      padding: 20,
+      alignItems: 'center',
+      elevation: 5,
+      width:300,
+    },
+    modalText: {
+      marginBottom: 10,
+      fontSize: 18,
+      textAlign: 'center',
+    },
+    closeText: {
+      color: 'blue',
+      marginTop: 10,
     },
   });
   
