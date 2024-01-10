@@ -29,6 +29,12 @@ const LoginScreen = ({ navigation }) => {
       await Font.loadAsync({
         'JimNightshade-Regular': require('../assets/fonts/JimNightshade-Regular.ttf'),
         'Satisfy-Regular': require('../assets/fonts/Satisfy-Regular.ttf'),
+        'Nunito': require('../assets/fonts/Nunito-Italic-VariableFont_wght.ttf'),
+        'Sacramento-Regular': require('../assets/fonts/Sacramento-Regular.ttf'),
+        'CarterOne-Regular': require('../assets/fonts/CarterOne-Regular.ttf'),
+        'Nature': require('../assets/fonts/Nature.ttf'),
+        'Brettley': require('../assets/fonts/Brettley.ttf'),
+        'Houston': require('../assets/fonts/Houston.otf'),
       });
       setFontLoaded(true);
     };
@@ -125,20 +131,16 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {fontLoaded && (
-        <Text style={[styles.text,
-          {
-            
-            marginTop: 100,
-            zIndex: 1, // Adjust the top margin for the text
-            fontFamily: 'JimNightshade-Regular', // Use the loaded custom font
-          },]}>
-          Notepad
-        </Text>
+        <Text style={styles.text}>Notepad</Text>
       )}
 
       <Image source={require('../assets/logo.png')} style={styles.bottomImage} />
       <View style={styles.curveContainer}>
-        <Text style={styles.loginText}>LOGIN</Text>
+      
+      {fontLoaded && (
+        <Text style={styles.loginText}>Login</Text>
+      )}
+
         {emailErrorMessage !== '' && <Text style={styles.errorText}>{emailErrorMessage}</Text>}
         <InputField label="Username" value={username} onChangeText={text => setUsername(text)} />
         {passwordErrorMessage !== '' && <Text style={styles.errorText}>{passwordErrorMessage}</Text>}
@@ -167,16 +169,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#E9B824',
   },
-  headerText: {
-    fontSize: 35,
-    fontWeight: 'bold', // or fontWeight: '500'
-    padding: 10,
-    textAlign: 'center',
-    position: 'absolute',
-    top: 40,
-    fontFamily: 'Satisfy-Regular', 
-    color: 'Black',
-  },
   curveContainer: {
     position: 'absolute',
     bottom: 0,
@@ -189,13 +181,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: '',
+    
   },
-  loginText: {
-    fontSize: 20,
-    bottom: 40,
-    fontWeight: 'bold', // or fontWeight: '500'
-    fontFamily: 'Satisfy-Regular' //Ineria Serif
-  },
+ 
   forgotPasswordText: {
     fontSize: 11,
     color: 'blue',
@@ -207,7 +195,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     bottom: -20,
     color: 'blue',
-    fontFamily: 'JimNightshade-Regular', //Ineria Serif
+    fontFamily: 'Sacramento-Regular', //Ineria Serif
   },
   errorText: {
     fontSize: 10,
@@ -218,12 +206,11 @@ const styles = StyleSheet.create({
     width: '50%'
   },
 
-  
   bottomImage: {
     width: 350,
     height: 350,
     position: 'absolute',
-    top: 0,
+    top: 20,
   },
 
   showPasswordContainer: {
@@ -233,7 +220,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     left: -24,
     bottom: 5,
-  
+
  },
 
  showPasswordText: {
@@ -246,6 +233,32 @@ const styles = StyleSheet.create({
  checkbox: {
   padding: 0,
   left: 12 
+},
+
+text: {
+  fontSize: 40,
+  padding: 15,
+  textAlign: 'center',
+  position: 'absolute',
+  top: 0,
+  marginTop: 50,
+  zIndex: 1,
+  fontFamily: 'Satisfy-Regular',
+  fontWeight:'500',
+},
+
+loginText: {
+  fontSize: 40,
+  padding: 5,
+  textAlign: 'center',
+  position: 'absolute',
+  top: 0,
+  marginTop: 10,
+  zIndex: 1,
+  fontFamily: 'Brettley',
+  fontWeight:"100",
+  
+  
 },
   
 });
