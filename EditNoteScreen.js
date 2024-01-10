@@ -3,11 +3,13 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'reac
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomAlert from '../components/CustomAlert';
 
 const EditNoteScreen = ({ navigation, route }) => {
   const { noteId, existingTitle, existingNote } = route.params;
   const [note, setNote] = useState(existingNote);
   const [title, setTitle] = useState(existingTitle);
+  const [isAlertVisible, setAlertVisible] = useState(false);
 
   const wordCount = note.trim().split(/\s+/).length;
 
@@ -32,15 +34,8 @@ const EditNoteScreen = ({ navigation, route }) => {
             item.id === noteId ? { ...item, title, note, dateTime } : item
           );
           await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
-
-          Alert.alert('Note Updated!', '', [
-            {
-              text: 'OK',
-              onPress: () => {
-                navigation.goBack();
-              },
-            },
-          ]);
+  
+          setAlertVisible(true);
         }
       } catch (error) {
         console.error('Error updating note:', error);
@@ -82,6 +77,16 @@ const EditNoteScreen = ({ navigation, route }) => {
       <TouchableOpacity onPress={updateNote} style={styles.button}>
         <Text style={styles.buttonText}>Update Note</Text>
       </TouchableOpacity>
+
+      <CustomAlert
+        isVisible={isAlertVisible}
+        closeAlert={() => {
+          setAlertVisible(false);
+          setTimeout(() => {
+            navigation.goBack();
+          }, 500); 
+        }}
+/>
     </View>
   );
 };
@@ -153,8 +158,8 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     width: 230,
-    alignSelf: 'center', // Center the button horizontally
-    borderRadius: 50, // Adjust the value to modify the curve amount
+    alignSelf: 'center', 
+    borderRadius: 50, 
   },
   buttonText: {
     fontSize: 16,
