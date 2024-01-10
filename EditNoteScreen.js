@@ -84,9 +84,10 @@ const EditNoteScreen = ({ navigation, route }) => {
           setAlertVisible(false);
           setTimeout(() => {
             navigation.goBack();
-          }, 500); 
+          }, 500); // Adjust the delay timing as needed
         }}
-/>
+        messageType="updated" // Pass the appropriate message type
+      />
     </View>
   );
 };
@@ -158,8 +159,8 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     width: 230,
-    alignSelf: 'center', 
-    borderRadius: 50, 
+    alignSelf: 'center', // Center the button horizontally
+    borderRadius: 50, // Adjust the value to modify the curve amount
   },
   buttonText: {
     fontSize: 16,
