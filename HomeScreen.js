@@ -1,252 +1,369 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, Text, TouchableOpacity, Image, Animated} from 'react-native';
-import { AppLoading } from 'expo';
-import * as Font from 'expo-font';
-// import CheckBox from '@react-native-community/checkbox';
-import InputField from "../components/InputField";
-import ThemeButton from "../components/ThemeButton";
+import React, { useEffect, useState, useRef, } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Modal } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
-import { Ionicons } from '@expo/vector-icons'; // You may need to install this package
+import DeleteNoteAlert from '../components/DeleteNoteAlert';
 
-const CustomCheckbox = ({ checked, onPress }) => {
+const SuccessMessage = ({ message, onClose }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.checkbox}>
-      {checked ? (
-        <Ionicons name="checkbox-outline" size={18} color="blue" />
-      ) : (
-        <Ionicons name="square-outline" size={18} color="blue" />
-      )}
-    </TouchableOpacity>
+    <Modal transparent visible={!!message} animationType="slide" >
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>{message}</Text>
+          <TouchableOpacity onPress={onClose}>
+            <Text style={styles.closeText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
   );
 };
 
-const LoginScreen = ({ navigation }) => {
-  const [fontLoaded, setFontLoaded] = useState(false);
+const HomeScreen = ({ navigation }) => {
+  const [notesData, setNotesData] = useState([]);
+  const [deleteNoteId, setDeleteNoteId] = useState(null);
+  const [sortBy, setSortBy] = useState(null);
+  const [showSortOptions, setShowSortOptions] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const alertRef = useRef(null);
 
-  useEffect(() => {
-    const loadFont = async () => {
-      await Font.loadAsync({
-        'JimNightshade-Regular': require('../assets/fonts/JimNightshade-Regular.ttf'),
-        'Satisfy-Regular': require('../assets/fonts/Satisfy-Regular.ttf'),
-      });
-      setFontLoaded(true);
-    };
-
-    loadFont();
-  }, []);;
-  
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailErrorMessage, setEmailErrorMessage] = useState(''); 
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState(''); 
-
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordText, setShowPasswordText] = useState("Show Password");
-
-  const validateEmail = (email) => {
-  const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-  return emailRegex.test(email);
+  const handleSuccessClose = () => {
+    setSuccessMessage('');
   };
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-    setShowPasswordText(showPassword ? "Show Password" : "Hide Password");
-  };
 
-  const handleLogin = async () => {
-    setEmailErrorMessage('');
-    setPasswordErrorMessage('');
-
-    if (password.trim() === ''){
-      setPasswordErrorMessage('Please enter password');
-    }
-
-    if (username.trim() === '') {
-      setEmailErrorMessage('');
-      setEmailErrorMessage('Please enter email');
-      return;
-    }
-
-    const normalizedEmail = username.toLowerCase();
-
-    if (!validateEmail(username)) {
-      setEmailErrorMessage('Invalid Email');
-      return;
-    }
-
-    try {
-  
-      const userData = await AsyncStorage.getItem('userData');
-      if (userData) {
-        const users = JSON.parse(userData);
-        const user = users.find((user) => user.email.toLowerCase() === normalizedEmail);
-
-        if (!user) {
-          setEmailErrorMessage('');
-          setEmailErrorMessage('Email does not exist. Please Sign Up!');
-        } else if (user.password !== password) {
-          setPasswordErrorMessage('Wrong Password');
-        } else {
-          console.log('User logged in successfully');
-          navigation.replace('HomeScreen', {
-            user: {
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-            },
-          });          
-          setUsername('');
-          setPassword('');
+  useFocusEffect(
+    React.useCallback(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+        const message = routeParams?.successMessage || '';
+        if (message) {
+          setSuccessMessage(message);
         }
-      } else {
-        console.log('No user data found. Please sign up first.');
-        alert('No user data found. Please sign up first.');
+        refreshNotes();
+      });
+  
+      return unsubscribe;
+    }, [navigation, routeParams])
+  );
+
+  
+  const { params: routeParams } = useRoute();
+
+// useFocusEffect(
+//   React.useCallback(() => {
+//     const unsubscribe = navigation.addListener('focus', () => {
+//       const successMessage = routeParams?.successMessage || '';
+//       if (successMessage) {
+//         alert(successMessage);
+//       }
+//       refreshNotes();
+//     });
+
+//     return unsubscribe;
+//   }, [navigation, routeParams])
+// );
+
+
+  const fetchAndSortNotes = async () => {
+    try {
+      const storedNotes = await AsyncStorage.getItem('notes');
+      if (storedNotes !== null) {
+        let parsedNotes = JSON.parse(storedNotes);
+        if (sortBy === 'latestToOldest') {
+          parsedNotes.sort((a, b) => moment(b.dateTime).valueOf() - moment(a.dateTime).valueOf());
+        } else if (sortBy === 'alphabetically') {
+          parsedNotes.sort((a, b) => a.title.localeCompare(b.title));
+        }
+        setNotesData(parsedNotes);
       }
     } catch (error) {
-      console.error('Error logging in', error);
-      alert('Error logging in. Please try again.');
+      console.error('Error fetching or sorting notes:', error);
     }
   };
 
-  const handleSignUp = () => {
-    navigation.navigate('SignUp');
-    setUsername('');
-    setPassword('');
+  const handleSort = (method) => {
+    setSortBy(method);
+    fetchAndSortNotes();
   };
 
-  const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
-    setUsername('');
-    setPassword('');
+  const refreshNotes = async () => {
+    await fetchAndSortNotes();
   };
+
+  useFocusEffect(() => {
+    refreshNotes();
+  });
+
+  const handleEditNote = (id, title, note) => {
+    navigation.navigate('EditNoteScreen', {
+      noteId: id,
+      existingTitle: title,
+      existingNote: note,
+    });
+  };
+
+  const handleDeleteNote = (id) => {
+    setDeleteNoteId(id);
+    alertRef.current.open();
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteNoteId !== null) {
+      try {
+        const existingNotes = await AsyncStorage.getItem('notes');
+        let notes = [];
+
+        if (existingNotes !== null) {
+          notes = JSON.parse(existingNotes);
+          const updatedNotes = notes.filter((note) => note.id !== deleteNoteId);
+          await AsyncStorage.setItem('notes', JSON.stringify(updatedNotes));
+          refreshNotes();
+        }
+      } catch (error) {
+        console.error('Error deleting note:', error);
+      } finally {
+        alertRef.current?.close();
+      }
+    }
+  };
+
+  useEffect(() => {
+    refreshNotes();
+  }, [sortBy]);
+
+  const renderNote = ({ item }) => {
+    const truncatedNote = item.note.length > 50 ? `${item.note.substring(0, 25)}...` : item.note;
+
+    
+    return (
+      <TouchableOpacity
+        style={styles.noteCard}
+        onPress={() => navigation.navigate('ViewNoteScreen', { noteContent: item })}
+      >
+        <View style={styles.noteHeader}>
+          <Text style={styles.noteTitle}>{item.title}</Text>
+          <View style={styles.iconsContainer}>
+            <TouchableOpacity onPress={() => handleEditNote(item.id, item.title, item.note)}>
+              <Ionicons name="create-outline" size={18} color="black" style={styles.icon} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteNote(item.id)}>
+              <Ionicons name="trash-outline" size={18} color="black" style={styles.icon} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Text style={styles.noteContent}>{truncatedNote}</Text>
+        <Text style={styles.noteDateTime}>{moment(item.dateTime).format('MMM DD, YYYY')}</Text>
+      </TouchableOpacity>
+    );
+    
+  };
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+  };
+
+
+
+  const filteredNotes = notesData.filter((note) => {
+    return note.title.toLowerCase().includes(searchText.toLowerCase());
+  });
+
+  const handleFilterIconPress = () => {
+    setShowSortOptions(!showSortOptions);
+    setShowSearchBar(false); 
+    setSearchText(''); 
+  };
+
+  const handleSearchIconPress = () => {
+    setShowSearchBar(!showSearchBar);
+    setShowSortOptions(false); 
+    setSearchText(''); 
+  };
+
 
   return (
     <View style={styles.container}>
-      {fontLoaded && (
-        <Text style={[styles.text,
-          {
-            
-            marginTop: 100,
-            zIndex: 1, // Adjust the top margin for the text
-            fontFamily: 'JimNightshade-Regular', // Use the loaded custom font
-          },]}>
-          Notepad
-        </Text>
-      )}
-
-      <Image source={require('../assets/logo.png')} style={styles.bottomImage} />
-      <View style={styles.curveContainer}>
-        <Text style={styles.loginText}>LOGIN</Text>
-        {emailErrorMessage !== '' && <Text style={styles.errorText}>{emailErrorMessage}</Text>}
-        <InputField label="Username" value={username} onChangeText={text => setUsername(text)} />
-        {passwordErrorMessage !== '' && <Text style={styles.errorText}>{passwordErrorMessage}</Text>}
-        <InputField label="Password" value={password} onChangeText={text => setPassword(text)} secureTextEntry={!showPassword} />
-        <View style={styles.showPasswordContainer}>
-          <CustomCheckbox checked={showPassword} onPress={toggleShowPassword} />
-          <Text style={styles.showPasswordText}>{showPasswordText}</Text>
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <Text style={styles.forgotPasswordText}>Forgot Password</Text>
+      <View style={styles.topSection}>
+        <Ionicons name="person-circle-outline" size={30} color="black" />
+        <Text style={styles.titleText}>Notepad</Text>
+        <View style={styles.topIcon}>
+          <TouchableOpacity onPress={handleSearchIconPress}>
+            <Ionicons name="search-outline" size={30} color="black" style={styles.iconsTop} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleFilterIconPress}>
+            <Ionicons name="filter" size={30} color="black" style={styles.iconsTop} />
           </TouchableOpacity>
         </View>
-        <ThemeButton title="Login" onPress={handleLogin} />
-        <TouchableOpacity onPress={handleSignUp}>
-          <Text style={styles.signUpText}>Don’t have an account Yet? Sign Up</Text>
-        </TouchableOpacity>
       </View>
+
+      <SuccessMessage message={successMessage} onClose={handleSuccessClose} />
+
+
+      {showSortOptions && (
+        <View style={styles.sortOptions}>
+          <TouchableOpacity onPress={() => handleSort('latestToOldest')}>
+            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Latest To Oldest</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleSort('alphabetically')}>
+            <Text style={[styles.sortOptionText, styles.sortOptionMargin]}>Alphabetically</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {showSearchBar && ( 
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search notes..."
+          onChangeText={handleSearch}
+          value={searchText}
+        />
+      )}
+
+      <FlatList
+        data={filteredNotes}
+        renderItem={renderNote}
+        keyExtractor={(item) => item.id.toString()}
+      />
+
+      <DeleteNoteAlert 
+        alertRef={alertRef}
+        deleteNoteId={deleteNoteId}
+        handleConfirmDelete={handleConfirmDelete}
+      />
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate('AddNoteScreen')}
+      >
+        <Ionicons name="add-circle-outline" size={50} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
 
-const screenHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#E9B824',
-  },
-  headerText: {
-    fontSize: 35,
-    fontWeight: 'bold', // or fontWeight: '500'
-    padding: 10,
-    textAlign: 'center',
-    position: 'absolute',
-    top: 40,
-    fontFamily: 'Satisfy-Regular', 
-    color: 'Black',
-  },
-  curveContainer: {
-    position: 'absolute',
-    bottom: 0,
-    height: screenHeight / 1.6,
-    borderTopLeftRadius: 80,
-    borderTopRightRadius: 0,
+    padding: 20,
+    paddingTop: 32,
     backgroundColor: 'white',
-    width: '100%',
-    paddingHorizontal: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: '',
   },
-  loginText: {
-    fontSize: 20,
-    bottom: 40,
-    fontWeight: 'bold', // or fontWeight: '500'
-    fontFamily: 'Satisfy-Regular' //Ineria Serif
-  },
-  forgotPasswordText: {
-    fontSize: 11,
-    color: 'blue',
-    right: -30,
-    fontFamily: 'JimNightshade-Regular', //Ineria Serif
-    marginTop: 1.5
-  },
-  signUpText: {
-    fontSize: 12,
-    bottom: -20,
-    color: 'blue',
-    fontFamily: 'JimNightshade-Regular', //Ineria Serif
-  },
-  errorText: {
-    fontSize: 10,
-    color: 'red',
-    marginTop: 5,
-    marginBottom:5,
-    left:-15,
-    width: '50%'
-  },
-
-  
-  bottomImage: {
-    width: 350,
-    height: 350,
-    position: 'absolute',
-    top: 0,
-  },
-
-  showPasswordContainer: {
+  topSection: {
     flexDirection: 'row',
-    alignItems: 'left',
-    justifyContent: 'left',
-    marginBottom: 10,
-    left: -24,
-    bottom: 5,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  titleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  noteCard: {
+    backgroundColor: '#e0e0e0',
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 8,
+  },
+  noteHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  noteTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  noteContent: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  noteDateTime: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+  },
+  topIcon: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+  },
+  iconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 10,
+  },
   
- },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+  sortOptions: {
+    backgroundColor: '#fff',
+    padding: 10,
+    position: 'absolute',
+    top: 100,
+    right: 20,
+    elevation: 5,
+    borderRadius: 5,
+    zIndex: 1,
+  },
+  sortOptionMargin: {
+    margin: 5,
+    marginBottom: 5, 
+  },
 
- showPasswordText: {
-    marginLeft: 16,
-    marginTop:1,
-    fontSize: 11,
-    color: 'black',
- },
+    sortOptionText: {
+      fontSize: 17, 
+      paddingVertical: 5,
+    },
 
- checkbox: {
-  padding: 0,
-  left: 12 
-},
+    iconsTop: {
+      marginRight: 10,
+    },
+    searchBar: {
+      backgroundColor: '#fff',
+      paddingHorizontal: 10,
+      paddingVertical: 8,
+      marginHorizontal: 20,
+      borderRadius: 8,
+      marginBottom: 10,
+    },
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    },
+    modalView: {
+      backgroundColor: 'white',
+      borderRadius: 10,
+      padding: 20,
+      alignItems: 'center',
+      elevation: 5,
+      width:300,
+    },
+    modalText: {
+      marginBottom: 10,
+      fontSize: 18,
+      textAlign: 'center',
+    },
+    closeText: {
+      color: 'blue',
+      marginTop: 10,
+    },
+  });
   
-});
-export default LoginScreen;
+  
+  
+
+
+export default HomeScreen;
