@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert, KeyboardAvoidingView } from 'react-native';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import moment from 'moment';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNote = ({ navigation }) => {
@@ -10,7 +11,7 @@ const AddNote = ({ navigation }) => {
 
   const insertNote = async () => {
     if (title !== '') {
-      const dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      const dateTime = moment().format('MMMM DD, YYYY h:mm A ddd');
 
       const newNote = {
         id: dateTime,
@@ -47,20 +48,28 @@ const AddNote = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <MaterialCommunityIcons name="chevron-left" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.titleText}>Notepad</Text>
+        <Text style={styles.titleText}>Go Back</Text>
       </View>
 
       <TextInput
         placeholder="Title"
         onChangeText={(text) => setTitle(text)}
         value={title}
-        style={[styles.input, styles.titleInput]}
+        style={[styles.input, styles.titleInput]} // Apply titleInput style here
       />
+
+      <View style={styles.infoContainer}>
+        <View style={styles.infoTextContainer}>
+          <Text style={styles.dateText}>{moment().format('MMMM DD, YYYY h:mm A')}</Text>
+          <Text style={styles.wordCountText}> {note.trim() === '' ? '0 words' : `${note.trim().split(/\s+/).length} words`}</Text>
+        </View>
+      </View>
+
       <TextInput
-        placeholder="ADD DESCRIPTION..."
+        placeholder="Add Description..."
         onChangeText={(text) => setNote(text)}
         multiline={true}
         value={note}
@@ -68,7 +77,7 @@ const AddNote = ({ navigation }) => {
       />
 
       <TouchableOpacity onPress={insertNote} style={styles.button}>
-        <Text>Add Note</Text>
+        <Text style={styles.buttonText}>Add Note</Text>
       </TouchableOpacity>
     </View>
   );
@@ -79,13 +88,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     justifyContent: 'space-between',
+    backgroundColor: '#FAF8F2',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 30,
+    marginBottom: 5,
+    marginTop: 40,
   },
   backButton: {
     position: 'absolute',
@@ -94,6 +104,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginLeft: 40,
   },
   input: {
     borderWidth: 0,
@@ -102,20 +113,49 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   titleInput: {
-    borderBottomWidth: 2,
-    borderColor: 'black',
-    fontSize: 20,
+    borderBottomWidth: 0,
+    borderColor: 'blue',
+    fontSize: 30,
+    marginTop:20,
+    marginLeft:8,
+    fontWeight: 'bold'
   },
   descriptionInput: {
-    height: 500,
-    textAlignVertical:"top",
+    height: 490,
+    textAlignVertical: 'top',
     fontSize: 17,
+    marginLeft:8,
+  },
+  infoContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    marginLeft: 18,
+  },
+  infoTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 12,
+    color: 'grey',
+    marginRight: 10,
+  },
+  wordCountText: {
+    fontSize: 12,
+    color: 'grey',
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#DDDDDD',
+    backgroundColor: '#E9B824',
     padding: 15,
     marginBottom: 20,
+    width: 230,
+    alignSelf: 'center', // Center the button horizontally
+    borderRadius: 50, // Adjust the value to modify the curve amount
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
