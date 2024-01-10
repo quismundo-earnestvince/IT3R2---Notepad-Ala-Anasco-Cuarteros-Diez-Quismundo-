@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import moment from 'moment';
+import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import moment from 'moment';
+import CustomAlert from '../components/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddNote = ({ navigation }) => {
   const [note, setNote] = useState('');
   const [title, setTitle] = useState('');
+  const [isAlertVisible, setAlertVisible] = useState(false);
 
   const insertNote = async () => {
     if (title !== '') {
@@ -31,14 +32,7 @@ const AddNote = ({ navigation }) => {
         notes.push(newNote);
         await AsyncStorage.setItem('notes', JSON.stringify(notes));
 
-        Alert.alert('Note Saved!', '', [
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('HomeScreen');
-            },
-          },
-        ]);
+        setAlertVisible(true); // Show the CustomAlert on successful note addition
       } catch (error) {
         console.error('Error saving note:', error);
       }
@@ -79,6 +73,18 @@ const AddNote = ({ navigation }) => {
       <TouchableOpacity onPress={insertNote} style={styles.button}>
         <Text style={styles.buttonText}>Add Note</Text>
       </TouchableOpacity>
+
+      <CustomAlert
+        isVisible={isAlertVisible}
+        closeAlert={() => {
+          setAlertVisible(false);
+          setTimeout(() => {
+            navigation.goBack();
+          }, 500); // Adjust the delay timing as needed
+        }}
+        messageType="added" 
+      />
+
     </View>
   );
 };
