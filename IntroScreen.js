@@ -1,11 +1,23 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, Text, Animated } from 'react-native';
+import * as Font from 'expo-font';
 
 const IntroScreen = ({ navigation }) => {
   const [showLogo, setShowLogo] = useState(false);
   const [logoSlide] = useState(new Animated.Value(0));
   const [textFade] = useState(new Animated.Value(0));
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadFont = async () => {
+      await Font.loadAsync({
+        'JimNightshade-Regular': require('../assets/fonts/JimNightshade-Regular.ttf'),
+      });
+      setFontLoaded(true);
+    };
+
+    loadFont();
+  }, []);
 
   useEffect(() => {
     const gifFreezeTimer = setTimeout(() => {
@@ -54,7 +66,7 @@ const IntroScreen = ({ navigation }) => {
         style={styles.gifImage}
         resizeMode="contain"
       />
-      {showLogo && (
+      {showLogo && fontLoaded && (
         <Animated.View
           style={[
             styles.logoContainer,
@@ -77,6 +89,7 @@ const IntroScreen = ({ navigation }) => {
               {
                 opacity: textFade,
                 marginTop: 10, // Adjust the top margin for the text
+                fontFamily: 'JimNightshade-Regular', // Use the loaded custom font
               },
             ]}
           >
@@ -115,9 +128,9 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 40,
-    fontFamily: 'JimNightshade-Regular',
     left: '3%',
   },
 });
 
 export default IntroScreen;
+
