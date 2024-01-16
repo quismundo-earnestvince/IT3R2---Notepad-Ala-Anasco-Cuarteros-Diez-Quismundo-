@@ -3,9 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const ViewNoteScreen = ({ route, navigation }) => {
-
   const { noteContent } = route.params;
-
   const { title, note } = noteContent;
 
   return (
@@ -30,42 +28,45 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     justifyContent: 'space-between',
+    backgroundColor: '#FAF8F2',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 30,
+    marginBottom: 5,
+    marginTop: 40,
   },
   backButton: {
-    position: 'absolute',
-    left: 10,
+  position: 'absolute',
+  left: 10,
   },
   titleText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  input: {
-    borderWidth: 0,
-    borderRadius: 0,
-    padding: 10,
-    marginBottom: 0,
-  },
-  titleInput: {
-    borderBottomWidth: 2,
-    borderColor: 'black',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  descriptionInput: {
-    textAlignVertical: 'top',
-    fontSize: 17,
+  fontSize: 18,
+  marginLeft: 40,
   },
   noteDetails: {
-    flex: 1,
-    justifyContent: 'flex-start',
+  flex: 1,
+  justifyContent: 'flex-start',
+  },
+  input: {
+  borderWidth: 0,
+  borderRadius: 0,
+  padding: 10,
+  marginBottom: 0,
+  },
+  titleInput: {
+  borderBottomWidth: 0,
+  borderColor: 'blue',
+  fontSize: 30,
+  marginTop: 20,
+  marginLeft: 8,
+  },
+  descriptionInput: {
+  height: 490,
+  textAlignVertical: 'top',
+  fontSize: 17,
+  marginLeft: 8,
   },
 });
 
