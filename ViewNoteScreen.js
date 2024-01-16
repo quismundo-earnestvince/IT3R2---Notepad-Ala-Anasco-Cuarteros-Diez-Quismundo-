@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import moment from 'moment';
 
 const ViewNoteScreen = ({ route, navigation }) => {
   const { noteContent } = route.params;
-  const { title, note } = noteContent;
+  const { title, note, dateTime } = noteContent;
+  const wordCount = note.trim().split(/\s+/).length;
 
   return (
     <View style={styles.container}>
@@ -12,30 +14,36 @@ const ViewNoteScreen = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.titleText}>Note Details</Text>
+        <Text style={styles.titleText}>Go Back</Text>
       </View>
 
-      <View style={styles.noteDetails}>
-        <Text style={[styles.input, styles.titleInput]}>{title}</Text>
-        <Text style={[styles.input, styles.descriptionInput]}>{note}</Text>
+      <Text style={[styles.titleInput]}>{title}</Text>
+
+      <View style={styles.infoContainer}>
+        <View style={styles.infoTextContainer}>
+          <Text style={styles.dateText}>{dateTime}</Text>
+          <Text style={styles.wordCountText}>{wordCount} words</Text>
+        </View>
       </View>
+      
+      <Text style={[styles.input, styles.descriptionInput]}>{note}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 10,
-    justifyContent: 'space-between',
-    backgroundColor: '#FAF8F2',
+  flex: 1,
+  padding: 10,
+  justifyContent: 'space-between',
+  backgroundColor: '#FAF8F2',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginBottom: 5,
-    marginTop: 40,
+  flexDirection: 'row',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  marginBottom: 5,
+  marginTop: 40,
   },
   backButton: {
   position: 'absolute',
@@ -45,28 +53,40 @@ const styles = StyleSheet.create({
   fontSize: 18,
   marginLeft: 40,
   },
-  noteDetails: {
-  flex: 1,
-  justifyContent: 'flex-start',
+  infoContainer: {
+  alignItems: 'flex-start',
+  marginBottom: 10,
+  marginLeft: 18,
   },
-  input: {
-  borderWidth: 0,
-  borderRadius: 0,
-  padding: 10,
-  marginBottom: 0,
+  infoTextContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
   },
+  dateText: {
+  fontSize: 12,
+  color: 'grey',
+  marginRight: 10,
+  },
+  wordCountText: {
+  fontSize: 12,
+  color: 'grey',
+  },
+
   titleInput: {
-  borderBottomWidth: 0,
-  borderColor: 'blue',
-  fontSize: 30,
-  marginTop: 20,
-  marginLeft: 8,
+    borderBottomWidth: 0,
+    borderColor: 'blue',
+    fontSize: 30,
+    marginTop:0,
+    marginLeft:8,
+    padding:10,
+    // fontWeight: 'bold'
   },
   descriptionInput: {
-  height: 490,
+  height: 550,
   textAlignVertical: 'top',
   fontSize: 17,
   marginLeft: 8,
+  paddingLeft:10,
   },
 });
 
